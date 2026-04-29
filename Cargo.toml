@@ -1,0 +1,11 @@
+[package]
+name = "OmniKey"
+version = "0.1.0"
+edition = "2021"
+description = "SSH and WireGuard keyset generator"
+
+[dependencies]
+base64   = "0.22"
+ssh-key  = { version = "0.6", features = ["ed25519", "rand_core"] }
+x25519-dalek = {version = "2.0.1", features = ["static_secrets"]}
+rand_core = { version = "0.6", features = ["getrandom"] }
