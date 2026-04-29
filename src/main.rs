@@ -1,11 +1,14 @@
-use OmniKey::{Generate, SshKeySet, WireguardKeySet};
+use OmniKey::generate::Generate;
+use OmniKey::keyset_ssh::SshKeySet;
+use OmniKey::keyset_wireguard::WireguardKeySet;
 
 fn main() {
     // --- WireGuard ---
-    let wg = WireguardKeySet::generate();
+    let mut wg = WireguardKeySet::generate();
     println!("=== WireGuard Key-Set ===");
     println!("{wg}");
 
+    wg =  WireguardKeySet::generate();
     // Einzelne Felder direkt nutzbar, z.B. für wg-quick-Configs:
     println!("\n[Interface]");
     println!("PrivateKey = {}", wg.private_key_base64());
