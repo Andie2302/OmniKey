@@ -19,15 +19,10 @@ impl SSHKeySet {
     /// Generiert ein echtes Ed25519 SSH-Schlüsselpaar im OpenSSH-Format
     pub fn generate() -> Result<Self, ssh_key::Error> {
         let ssh_key = SshPrivateKey::random(&mut OsRng, Algorithm::Ed25519)?;
-
-        // Private Key → OpenSSH PEM-Format (z.B. für ~/.ssh/id_ed25519)
         let private_pem = ssh_key.to_openssh(LineEnding::LF)?;
-        // Public Key → authorized_keys-Format (z.B. für ~/.ssh/id_ed25519.pub)
         let public_openssh = ssh_key.public_key().to_openssh()?;
-
         let private_key = PrivateKey::new(Key::new(private_pem.as_bytes().to_vec()));
         let public_key  = PublicKey::new(Key::new(public_openssh.as_bytes().to_vec()));
-
         Ok(Self {
             keyset: KeySet::new(private_key, public_key),
         })
