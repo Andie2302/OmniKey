@@ -1,10 +1,7 @@
-use std::fmt;
-use rand_core::OsRng;
-use ssh_key::{Algorithm, LineEnding, PrivateKey as SshPrivateKey};
-use crate::key::Key;
 use crate::key_set::KeySet;
 use crate::private_key::PrivateKey;
 use crate::public_key::PublicKey;
+use std::fmt;
 
 pub struct SSHKeySet {
     keyset: KeySet,
