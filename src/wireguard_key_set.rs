@@ -2,7 +2,6 @@ use crate::key_set::KeySet;
 use crate::preshared_key::PresharedKey;
 use crate::private_key::PrivateKey;
 use crate::public_key::PublicKey;
-use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct WireGuardKeySet {
@@ -17,16 +16,4 @@ impl WireGuardKeySet {
     pub fn private_key(&self) -> &PrivateKey         { self.keyset.private_key() }
     pub fn public_key(&self)  -> &PublicKey          { self.keyset.public_key()  }
     pub fn preshared_key(&self) -> Option<&PresharedKey> { self.preshared_key.as_ref() }
-}
-
-impl fmt::Display for WireGuardKeySet {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "WireGuard KeySet:")?;
-        writeln!(f, "  PrivateKey:    {}", self.private_key().to_base64())?;
-        writeln!(f, "  PublicKey:     {}", self.public_key().to_base64())?;
-        if let Some(psk) = &self.preshared_key {
-            writeln!(f, "  PresharedKey:  {}", psk.to_base64())?;
-        }
-        Ok(())
-    }
 }
