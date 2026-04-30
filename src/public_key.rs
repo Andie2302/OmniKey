@@ -3,7 +3,7 @@ use crate::key::Key;
 
 #[derive(Debug, Clone)]
 pub struct PublicKey {
-    public_key: Key,  // war fälschlicherweise `pub`
+    public_key: Key,
 }
 
 impl PublicKey {
