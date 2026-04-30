@@ -3,7 +3,6 @@ use base64::{engine::general_purpose::STANDARD, Engine};
 
 const BASE64_ENGINE: &'static base64::engine::general_purpose::GeneralPurpose = &STANDARD;
 
-/// Raw key bytes with Base64 display output.
 #[derive(Debug, Clone)]
 pub struct Key {
     pub raw: Vec<u8>,
@@ -16,9 +15,11 @@ impl From<Vec<u8>> for Key {
 }
 
 impl Key {
-    /// Base64-encoded key (standard alphabet, with padding).
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.raw
+    }
     pub fn as_base64(&self) -> String {
-        BASE64_ENGINE.encode(&self.raw)
+        BASE64_ENGINE.encode(self.as_bytes())
     }
 }
 
