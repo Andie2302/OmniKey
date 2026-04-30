@@ -11,16 +11,12 @@ impl Key {
     pub fn new(bytes: Vec<u8>) -> Self {
         Self { bytes }
     }
-
     pub fn as_bytes(&self) -> &[u8] {
         &self.bytes
     }
-
     pub fn to_base64(&self) -> String {
         STANDARD.encode(&self.bytes)
     }
-
-    /// Gibt Bytes als UTF-8-String zurück – für SSH-Keys (OpenSSH-Format)
     pub fn to_utf8_or_base64(&self) -> String {
         match std::str::from_utf8(&self.bytes) {
             Ok(s) => s.to_string(),
