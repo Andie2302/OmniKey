@@ -1,7 +1,6 @@
-use std::fmt;
-use std::ops::Deref;
 use crate::key::Key;
 use crate::key_set::KeySet;
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct WireGuardKeySet {
@@ -13,17 +12,10 @@ impl WireGuardKeySet {
     pub fn new(keyset: KeySet, preshared_key: Option<Key>) -> Self {
         Self { keyset, preshared_key }
     }
-
+    pub fn private_key(&self) -> &Key { self.keyset.private_key() }
+    pub fn public_key(&self) -> &Key  { self.keyset.public_key() }
     pub fn preshared_key(&self) -> Option<&Key> {
         self.preshared_key.as_ref()
-    }
-}
-
-impl Deref for WireGuardKeySet {
-    type Target = KeySet;
-
-    fn deref(&self) -> &Self::Target {
-        &self.keyset
     }
 }
 
@@ -32,7 +24,7 @@ impl fmt::Display for WireGuardKeySet {
         writeln!(f, "WireGuard KeySet:")?;
         write!(f, "{}", self.keyset)?;
         if let Some(key) = &self.preshared_key {
-            write!(f, "  Preshared: {}", key)?;
+            write!(f, "{}", key)?;
         }
         writeln!(f,"")?;
         Ok(())
