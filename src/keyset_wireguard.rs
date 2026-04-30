@@ -1,8 +1,6 @@
 use std::fmt;
-
 use rand_core::OsRng;
 use x25519_dalek::{PublicKey, StaticSecret};
-
 use crate::{
     generate::Generate,
     key::Key,
@@ -13,8 +11,12 @@ use crate::{
 /// Alle Schlüssel sind 32-Byte Curve25519-Schlüssel, Base64-kodiert (WireGuard-Standard).
 #[derive(Debug, Clone)]
 pub struct WireguardKeySet {
-    pub keys:           KeySet,
+    pub keys: KeySet,
     pub pre_shared_key: Key,
+}
+
+fn secret_to_key(secret: StaticSecret) -> Key {
+    Key::from(secret.to_bytes().to_vec())
 }
 
 impl WireguardKeySet {
@@ -36,19 +38,18 @@ impl WireguardKeySet {
 
 impl Generate for WireguardKeySet {
     fn generate() -> Self {
-        // Privater Schlüssel (Curve25519 StaticSecret)
-        let private = StaticSecret::random_from_rng(OsRng);
-        let public  = PublicKey::from(&private);
+        let mut rng = OsRng;
 
-        // Pre-Shared Key ist ein weiterer zufälliger 32-Byte-Schlüssel
-        let psk = StaticSecret::random_from_rng(OsRng);
+        let private_secret = StaticSecret::random_from_rng(&mut rng);
+        let public_key = Key::from(PublicKey::from(&private_secret).to_bytes().to_vec());
+        let private_key = secret_to_key(private_secret);
+
+        let pre_shared_secret = StaticSecret::random_from_rng(&mut rng);
+        let pre_shared_key = secret_to_key(pre_shared_secret);
 
         Self {
-            keys: KeySet::new(
-                Key::new(private.to_bytes().to_vec()),
-                Key::new(public.to_bytes().to_vec()),
-            ),
-            pre_shared_key: Key::new(psk.to_bytes().to_vec()),
+            keys: KeySet::new(private_key, public_key),
+            pre_shared_key,
         }
     }
 }
@@ -58,9 +59,9 @@ impl fmt::Display for WireguardKeySet {
         write!(
             f,
             "WireGuard KeySet\n  Private:    {}\n  Public:     {}\n  PreShared:  {}",
-            self.private_key_base64(),
-            self.public_key_base64(),
-            self.preshared_key_base64(),
+            self.keys.private_key,
+            self.keys.public_key,
+            self.pre_shared_key,
         )
     }
 }
