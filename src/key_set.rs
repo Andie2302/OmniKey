@@ -21,7 +21,9 @@ impl KeySet {
 
 impl fmt::Display for KeySet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.private_key)?;
-        write!(f, "{}", self.public_key)
+        writeln!(f, "{}", self.private_key)?;
+        writeln!(f,"")?;
+        writeln!(f, "{}", self.public_key)?;
+        writeln!(f,"")
     }
 }
