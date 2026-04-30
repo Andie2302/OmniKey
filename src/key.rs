@@ -25,12 +25,6 @@ impl Key {
     }
 }
 
-impl fmt::Display for Key {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_base64())
-    }
-}
-
 impl From<Vec<u8>> for Key {
     fn from(bytes: Vec<u8>) -> Self {
         Self::new(bytes)
