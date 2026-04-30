@@ -1,37 +1,17 @@
 use crate::key::Key;
 use std::fmt;
 
-#[derive(Debug, Clone, Default)]
-pub enum KeySetType {
-    SSH,
-    #[default]
-    WireGuard,
-    Custom(String),
-}
-
-impl fmt::Display for KeySetType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            KeySetType::SSH => write!(f, "SSH"),
-            KeySetType::WireGuard => write!(f, "WireGuard"),
-            KeySetType::Custom(s) => write!(f, "Custom ({})", s),
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct KeySet {
     private_key: Key,
     public_key: Key,
-    key_type: KeySetType,
 }
 
 impl KeySet {
-    pub fn new(private_key: Key, public_key: Key, key_type: KeySetType) -> Self {
+    pub fn new(private_key: Key, public_key: Key) -> Self {
         Self {
             private_key,
             public_key,
-            key_type,
         }
     }
 
@@ -41,7 +21,6 @@ impl KeySet {
 
 impl fmt::Display for KeySet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        writeln!(f, "=== KeySet ({}) ===", self.key_type)?;
         write!(f, "{}", self.private_key)?;
         write!(f, "{}", self.public_key)
     }
