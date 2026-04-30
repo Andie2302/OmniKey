@@ -2,11 +2,10 @@ use std::fmt;
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub enum KeyType {
     Public,
     Private,
-    #[default]
     Preshared
 }
 impl fmt::Display for KeyType {
