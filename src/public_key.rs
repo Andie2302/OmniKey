@@ -1,4 +1,3 @@
-use std::fmt;
 use crate::key::Key;
 
 #[derive(Debug, Clone)]
@@ -17,13 +16,6 @@ impl PublicKey {
         self.public_key.to_base64()
     }
 }
-
-impl fmt::Display for PublicKey {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "  Value: {}", self.public_key.to_base64())
-    }
-}
-
 impl From<Vec<u8>> for PublicKey {
     fn from(bytes: Vec<u8>) -> Self {
         Self::new(Key::from(bytes))
