@@ -1,5 +1,5 @@
 use OmniKey::key::Key;
-use OmniKey::keyset::{KeySet};
+use OmniKey::key_set::{KeySet};
 
 fn main() -> std::io::Result<()> {
 
