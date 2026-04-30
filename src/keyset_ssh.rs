@@ -1,5 +1,6 @@
-use std::fmt;
-
+use std::{fmt, fs};
+use std::os::unix::fs::PermissionsExt;
+use std::path::PathBuf;
 use rand_core::OsRng;
 use ssh_key::{Algorithm, LineEnding, PrivateKey};
 use ssh_key::private::KeypairData;
@@ -105,5 +106,38 @@ impl fmt::Display for SshKeySet {
             self.openssh_public,
             self.openssh_private,
         )
+    }
+}
+
+
+impl SshKeySet {
+    /// Speichert die Schlüssel sicher im Standard-SSH-Ordner.
+    pub fn save_to_default_location(&self, filename: &str) -> std::io::Result<PathBuf> {
+        // 1. Home-Pfad sicher finden (mit dem home crate)
+        let mut ssh_dir = home::home_dir().ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "Home-Verzeichnis nicht gefunden")
+        })?;
+
+        ssh_dir.push(".ssh");
+
+        // 2. .ssh Ordner erstellen, falls er fehlt
+        if !ssh_dir.exists() {
+            fs::create_dir_all(&ssh_dir)?;
+            #[cfg(unix)]
+            fs::set_permissions(&ssh_dir, fs::Permissions::from_mode(0o700))?;
+        }
+
+        let priv_path = ssh_dir.join(filename);
+        let pub_path = ssh_dir.join(format!("{}.pub", filename));
+
+        // 3. Private Key schreiben und Rechte auf 600 setzen
+        fs::write(&priv_path, self.private_key_pem())?;
+        #[cfg(unix)]
+        fs::set_permissions(&priv_path, fs::Permissions::from_mode(0o600))?;
+
+        // 4. Public Key schreiben (Rechte 644 sind Standard)
+        fs::write(&pub_path, self.public_key_openssh())?;
+
+        Ok(priv_path)
     }
 }
