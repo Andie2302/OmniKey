@@ -14,18 +14,6 @@ impl SSHKeySet {
     pub fn new(keyset: KeySet) -> Self {
         Self { keyset }
     }
-
-    pub fn generate() -> Result<Self, ssh_key::Error> {
-        let ssh_key = SshPrivateKey::random(&mut OsRng, Algorithm::Ed25519)?;
-        let private_pem = ssh_key.to_openssh(LineEnding::LF)?;
-        let public_openssh = ssh_key.public_key().to_openssh()?;
-        let private_key = PrivateKey::new(Key::new(private_pem.as_bytes().to_vec()));
-        let public_key  = PublicKey::new(Key::new(public_openssh.as_bytes().to_vec()));
-        Ok(Self {
-            keyset: KeySet::new(private_key, public_key),
-        })
-    }
-
     pub fn private_key(&self) -> &PrivateKey { self.keyset.private_key() }
     pub fn public_key(&self)  -> &PublicKey  { self.keyset.public_key()  }
 }
