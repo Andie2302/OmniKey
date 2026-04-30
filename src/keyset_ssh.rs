@@ -10,30 +10,68 @@ use crate::{
     keyset::KeySet,
 };
 
-/// SSH-Schlüsselset (Ed25519).
-/// Enthält die rohen Schlüsselbytes sowie die fertigen OpenSSH-Strings.
+const ED25519_ALGORITHM: Algorithm = Algorithm::Ed25519;
+
+/// Encoded OpenSSH strings derived from a private key.
+struct OpenSshStrings {
+    private_pem: String,
+    public_openssh: String,
+    comment: String,
+}
+
+/// Raw Ed25519 key bytes (private seed, public point).
+struct Ed25519Bytes {
+    private: Vec<u8>,
+    public: Vec<u8>,
+}
+
+fn encode_openssh_strings(private_key: &PrivateKey) -> OpenSshStrings {
+    let private_pem = private_key
+        .to_openssh(LineEnding::LF)
+        .expect("Failed to encode private key as OpenSSH PEM")
+        .to_string();
+
+    let public_openssh = private_key
+        .public_key()
+        .to_openssh()
+        .expect("Failed to encode public key as OpenSSH");
+
+    let comment = private_key.comment().to_string();
+
+    OpenSshStrings { private_pem, public_openssh, comment }
+}
+
+fn extract_ed25519_bytes(private_key: &PrivateKey) -> Ed25519Bytes {
+    match private_key.key_data() {
+        KeypairData::Ed25519(kp) => Ed25519Bytes {
+            private: kp.private.to_bytes().to_vec(),
+            public: kp.public.0.to_vec(),
+        },
+        _ => panic!("Unexpected key type: expected Ed25519"),
+    }
+}
+
+/// SSH key set (Ed25519).
+/// Holds raw key bytes as well as the formatted OpenSSH strings.
 #[derive(Debug, Clone)]
 pub struct SshKeySet {
-    /// Rohe 32-Byte-Schlüssel (privater Seed, öffentlicher Punkt).
+    /// Raw 32-byte keys (private seed, public point).
     pub keys: KeySet,
-
-    /// Privater Schlüssel im OpenSSH-PEM-Format (→ `~/.ssh/id_ed25519`).
+    /// Private key in OpenSSH PEM format (→ `~/.ssh/id_ed25519`).
     openssh_private: String,
-
-    /// Öffentlicher Schlüssel im authorized_keys-Format (→ `~/.ssh/id_ed25519.pub`).
+    /// Public key in authorized_keys format (→ `~/.ssh/id_ed25519.pub`).
     openssh_public: String,
-
-    /// Optionaler Kommentar (standardmäßig leer).
+    /// Optional comment (empty by default).
     pub comment: String,
 }
 
 impl SshKeySet {
-    /// Privater Schlüssel als OpenSSH-PEM-String.
+    /// Private key as an OpenSSH PEM string.
     pub fn private_key_pem(&self) -> &str {
         &self.openssh_private
     }
 
-    /// Öffentlicher Schlüssel im `authorized_keys`-Format.
+    /// Public key in `authorized_keys` format.
     pub fn public_key_openssh(&self) -> &str {
         &self.openssh_public
     }
@@ -41,38 +79,19 @@ impl SshKeySet {
 
 impl Generate for SshKeySet {
     fn generate() -> Self {
-        let private_key = PrivateKey::random(&mut OsRng, Algorithm::Ed25519)
-            .expect("Ed25519-Schlüsselgenerierung fehlgeschlagen");
+        let private_key = PrivateKey::random(&mut OsRng, ED25519_ALGORITHM)
+            .expect("Ed25519 key generation failed");
 
-        // OpenSSH-formatierte Strings erzeugen
-        let openssh_private = private_key
-            .to_openssh(LineEnding::LF)
-            .expect("Fehler beim Kodieren des privaten Schlüssels")
-            .to_string();
+        let OpenSshStrings { private_pem, public_openssh, comment } =
+            encode_openssh_strings(&private_key);
 
-        let openssh_public = private_key
-            .public_key()
-            .to_openssh()
-            .expect("Fehler beim Kodieren des öffentlichen Schlüssels");
-
-        let comment = private_key.comment().to_string();
-
-        // Rohe Ed25519-Bytes für das generische KeySet extrahieren
-        let (private_bytes, public_bytes) = match private_key.key_data() {
-            KeypairData::Ed25519(kp) => (
-                kp.private.to_bytes().to_vec(),
-                kp.public.0.to_vec(),
-            ),
-            _ => panic!("Unerwarteter Schlüsseltyp"),
-        };
+        let Ed25519Bytes { private, public } =
+            extract_ed25519_bytes(&private_key);
 
         Self {
-            keys: KeySet::new(
-                Key::new(private_bytes),
-                Key::new(public_bytes),
-            ),
-            openssh_private,
-            openssh_public,
+            keys: KeySet::new(Key::from(private), Key::from(public)),
+            openssh_private: private_pem,
+            openssh_public: public_openssh,
             comment,
         }
     }
