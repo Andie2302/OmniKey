@@ -22,12 +22,12 @@ fn secret_to_key(secret: StaticSecret) -> Key {
 impl WireguardKeySet {
     /// Gibt den privaten Schlüssel als Base64 zurück (für `wg set ... private-key`).
     pub fn private_key_base64(&self) -> String {
-        self.keys.private_key.as_base64()
+        self.keys.private_key().as_base64()
     }
 
     /// Gibt den öffentlichen Schlüssel als Base64 zurück (für `wg set ... peer ... public-key`).
     pub fn public_key_base64(&self) -> String {
-        self.keys.public_key.as_base64()
+        self.keys.public_key().as_base64()
     }
 
     /// Gibt den Pre-Shared Key als Base64 zurück (für `wg set ... peer ... preshared-key`).
@@ -59,8 +59,8 @@ impl fmt::Display for WireguardKeySet {
         write!(
             f,
             "WireGuard KeySet\n  Private:    {}\n  Public:     {}\n  PreShared:  {}",
-            self.keys.private_key,
-            self.keys.public_key,
+            self.keys.private_key(),
+            self.keys.public_key(),
             self.pre_shared_key,
         )
     }
