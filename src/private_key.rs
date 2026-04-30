@@ -1,6 +1,5 @@
-use std::fmt;
 use crate::key::Key;
-use crate::preshared_key::PresharedKey;
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct PrivateKey {
@@ -17,5 +16,11 @@ impl fmt::Display for PrivateKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let value = self.private_key.to_base64();
         write!(f, "  Value: {value}")
+    }
+}
+
+impl From<(Vec<u8>)> for PrivateKey {
+    fn from((bytes): (Vec<u8>)) -> Self {
+        Self::new(Key::from(bytes))
     }
 }
