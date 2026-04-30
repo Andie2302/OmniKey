@@ -7,16 +7,14 @@ pub enum KeyType {
     Public,
     Private,
     #[default]
-    Preshared,
-    Custom(String),
+    Preshared
 }
 impl fmt::Display for KeyType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             KeyType::Public => write!(f, "Public"),
             KeyType::Private => write!(f, "Private"),
-            KeyType::Preshared => write!(f, "Preshared"),
-            KeyType::Custom(s) => write!(f, "Custom ({})", s),
+            KeyType::Preshared => write!(f, "Preshared")
         }
     }
 }
@@ -62,8 +60,3 @@ impl From<(Vec<u8>, KeyType)> for Key {
     }
 }
 
-impl From<(Vec<u8>, String)> for Key {
-    fn from((bytes, label): (Vec<u8>, String)) -> Self {
-        Self::new(bytes, KeyType::Custom(label))
-    }
-}
