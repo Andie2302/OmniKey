@@ -10,11 +10,9 @@ impl PrivateKey {
     pub fn new(private_key: Key) -> Self {
         Self { private_key }
     }
-
     pub fn as_bytes(&self) -> &[u8] {
         self.private_key.as_bytes()
     }
-
     pub fn to_base64(&self) -> String {
         self.private_key.to_base64()
     }
