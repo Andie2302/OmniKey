@@ -1,4 +1,5 @@
 use OmniKey::key::Key;
+use OmniKey::keyset::{KeySet, KeySetType};
 
 fn main() -> std::io::Result<()> {
     // Variante 1: Mit Label (nutzt das Tupel-From)
@@ -8,6 +9,14 @@ fn main() -> std::io::Result<()> {
     // Variante 2: Ohne Label (nutzt das einfache Vec-From)
     let key2 = Key::from(vec![4, 5, 6]);
     println!("{key2}");
+
+
+    let keyset = KeySet::new(key1.clone(), key2.clone(), KeySetType::Custom("Test".to_string()));
+    println!("{keyset}");
+
+    let keyset2 = KeySet::new(key1, key2, Default::default() );
+    println!("{keyset2}");
+
 
     Ok(())
 }
