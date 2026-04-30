@@ -47,12 +47,6 @@ impl fmt::Display for Key {
     }
 }
 
-impl From<Vec<u8>> for Key {
-    fn from(bytes: Vec<u8>) -> Self {
-        Self::new(bytes, KeyType::Private)
-    }
-}
-
 impl From<(Vec<u8>, KeyType)> for Key {
     fn from((bytes, k_type): (Vec<u8>, KeyType)) -> Self {
         Self::new(bytes, k_type)
