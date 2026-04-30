@@ -7,13 +7,22 @@ const LABEL_PUBLIC: &str = "Public";
 /// Generisches Schlüsselpaar aus privatem und öffentlichem Schlüssel.
 #[derive(Debug, Clone)]
 pub struct KeySet {
-    pub private_key: Key,
-    pub public_key: Key,
+    key_private: Key,
+    key_public: Key,
 }
 
 impl KeySet {
     pub fn new(private_key: Key, public_key: Key) -> Self {
-        Self { private_key, public_key }
+        Self {
+            key_private: private_key,
+            key_public: public_key,
+        }
+    }
+    pub fn private_key(&self) -> &Key {
+        &self.key_private
+    }
+    pub fn public_key(&self) -> &Key {
+        &self.key_public
     }
 }
 
@@ -29,8 +38,8 @@ impl fmt::Display for KeySet {
         write!(
             f,
             "{}: {}\n{}: {}",
-            LABEL_PRIVATE, self.private_key,
-            LABEL_PUBLIC, self.public_key,
+            LABEL_PRIVATE, self.private_key(),
+            LABEL_PUBLIC, self.public_key(),
         )
     }
 }
