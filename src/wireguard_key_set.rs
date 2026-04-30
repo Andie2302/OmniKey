@@ -1,7 +1,6 @@
 use std::fmt;
 use rand_core::{OsRng, RngCore};
 use x25519_dalek::{StaticSecret, PublicKey as X25519Public};
-
 use crate::key::Key;
 use crate::key_set::KeySet;
 use crate::preshared_key::PresharedKey;
@@ -19,16 +18,11 @@ impl WireGuardKeySet {
         Self { keyset, preshared_key }
     }
 
-    /// Generiert ein echtes WireGuard-Schlüsselpaar (X25519) + optionaler Preshared Key
     pub fn generate(with_preshared: bool) -> Self {
-        // Private Key: zufälliger X25519 Static Secret
         let secret = StaticSecret::random_from_rng(OsRng);
-        // Public Key: mathematisch abgeleitet vom Private Key
         let public = X25519Public::from(&secret);
-
         let private_key = PrivateKey::new(Key::new(secret.to_bytes().to_vec()));
         let public_key  = PublicKey::new(Key::new(public.to_bytes().to_vec()));
-
         let preshared_key = if with_preshared {
             let mut bytes = [0u8; 32];
             OsRng.fill_bytes(&mut bytes);
