@@ -1,8 +1,7 @@
 use std::fmt;
 use crate::key::Key;
 
-const LABEL_PRIVATE: &str = "Private";
-const LABEL_PUBLIC: &str = "Public";
+
 
 /// Generisches Schlüsselpaar aus privatem und öffentlichem Schlüssel.
 #[derive(Debug, Clone)]
@@ -33,7 +32,12 @@ impl From<(Key, Key)> for KeySet {
     }
 }
 
+
+const LABEL_PRIVATE: &str = "Private";
+const LABEL_PUBLIC: &str = "Public";
 impl fmt::Display for KeySet {
+
+
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
