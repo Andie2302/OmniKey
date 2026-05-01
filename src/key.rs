@@ -1,6 +1,5 @@
-use std::fmt;
-use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use base64::Engine;
 
 #[derive(Debug, Clone)]
 pub struct Key {
