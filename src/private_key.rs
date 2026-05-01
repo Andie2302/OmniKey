@@ -1,6 +1,4 @@
 use crate::key::Key;
-use std::fmt;
-
 #[derive(Debug, Clone)]
 pub struct PrivateKey {
     private_key: Key,
